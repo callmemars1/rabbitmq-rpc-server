@@ -4,6 +4,15 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageVersion>0.5.0</PackageVersion>
+        <Title>Smartynov.RabbitMq.Rpc</Title>
+        <Authors>Sergey Martynov</Authors>
+        <Description>Basic rabbitmq rpc server</Description>
+        <Copyright>callmemars1</Copyright>
+        <PackageProjectUrl>https://github.com/callmemars1/rabbitmq-rpc-server</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/callmemars1/rabbitmq-rpc-server</RepositoryUrl>
+        <PackageTags>rabbitmq rpc </PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>

@@ -9,23 +9,25 @@ public class BasicRabbitMqRpcServer :
     IRabbitMqRpcServer,
     IDisposable
 {
-    private readonly RabbitMqConnectionProperties _connectionProperties;
+    private readonly Uri _connectionUri;
     private IConnection? _connection;
     private IModel? _model;
 
+    public BasicRabbitMqRpcServer(Uri connectionUri)
+    {
+        _connectionUri = connectionUri;
+    }
     public BasicRabbitMqRpcServer(RabbitMqConnectionProperties connectionProperties)
     {
-        _connectionProperties = connectionProperties;
+        _connectionUri = 
+            new Uri($"amqp://{connectionProperties.Username}:{connectionProperties.Password}@{connectionProperties.Hostname}:{connectionProperties.Port}/{connectionProperties.VirtualHost}");
     }
 
     public void Start()
     {
         var connectionFactory = new ConnectionFactory()
         {
-            HostName = _connectionProperties.Hostname,
-            UserName = _connectionProperties.Username,
-            Password = _connectionProperties.Password,
-            Port = _connectionProperties.Port,
+            Uri = _connectionUri,
 
             DispatchConsumersAsync = true
         };

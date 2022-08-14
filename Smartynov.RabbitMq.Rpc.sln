@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smartynov.RabbitMq.Rpc", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smartynov.RabbitMq.Rpc.Tests", "Smartynov.RabbitMq.Rpc.Tests\Smartynov.RabbitMq.Rpc.Tests.csproj", "{B97D3C92-A274-4942-93C2-CAA7532D8B34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{9441F40E-6200-4911-8E8A-3F26827E084E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{0C62A54B-CF11-435D-9721-FE05CA55B4B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{B97D3C92-A274-4942-93C2-CAA7532D8B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B97D3C92-A274-4942-93C2-CAA7532D8B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B97D3C92-A274-4942-93C2-CAA7532D8B34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9441F40E-6200-4911-8E8A-3F26827E084E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9441F40E-6200-4911-8E8A-3F26827E084E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9441F40E-6200-4911-8E8A-3F26827E084E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9441F40E-6200-4911-8E8A-3F26827E084E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C62A54B-CF11-435D-9721-FE05CA55B4B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C62A54B-CF11-435D-9721-FE05CA55B4B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C62A54B-CF11-435D-9721-FE05CA55B4B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C62A54B-CF11-435D-9721-FE05CA55B4B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
