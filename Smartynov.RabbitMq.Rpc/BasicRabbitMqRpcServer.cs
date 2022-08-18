@@ -19,8 +19,7 @@ public class BasicRabbitMqRpcServer :
     }
     public BasicRabbitMqRpcServer(RabbitMqConnectionProperties connectionProperties)
     {
-        _connectionUri = 
-            new Uri($"amqp://{connectionProperties.Username}:{connectionProperties.Password}@{connectionProperties.Hostname}:{connectionProperties.Port}/{connectionProperties.VirtualHost}");
+        _connectionUri = connectionProperties.ToUri();
     }
 
     public void Start()
@@ -29,13 +28,19 @@ public class BasicRabbitMqRpcServer :
         {
             Uri = _connectionUri,
 
-            DispatchConsumersAsync = true
+            DispatchConsumersAsync = true,
+            AutomaticRecoveryEnabled = true,
+            TopologyRecoveryEnabled = true,
+            NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
         };
         _connection = connectionFactory.CreateConnection();
         _model = _connection.CreateModel();
         _model.BasicQos(
             prefetchSize: 0, prefetchCount: 1, global: false);
+        Listening = true;
     }
+
+    public bool Listening { get; protected set; }
 
     public void AddRpc(string methodName, IRemoteProcedure procedure)
     {
@@ -92,6 +97,7 @@ public class BasicRabbitMqRpcServer :
         }
 
         _connection?.Dispose();
+        Listening = false;
     }
 
     protected virtual void Dispose(bool disposing)

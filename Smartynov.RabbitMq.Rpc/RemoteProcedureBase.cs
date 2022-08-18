@@ -26,6 +26,7 @@ public abstract class RemoteProcedureBase<TArgument, TResult> : IRemoteProcedure
 
     /// <summary>
     /// Throw RemoteProcedureException if you want to send error response.
+    /// In this case message will not be acknowledged
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
@@ -33,8 +34,6 @@ public abstract class RemoteProcedureBase<TArgument, TResult> : IRemoteProcedure
 
     /// <summary>
     /// If you want to handle exception, override this method.
-    /// <code></code>
-    /// Potential use: marking messages as acknowledged even when processing failed.
     /// </summary>
     protected virtual void HandleException(Exception exception)
         => throw new RemoteProcedureException("procedure failed", exception);
