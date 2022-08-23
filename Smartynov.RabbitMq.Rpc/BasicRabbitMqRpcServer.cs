@@ -42,7 +42,7 @@ public class BasicRabbitMqRpcServer :
 
     public bool Listening { get; protected set; }
 
-    public void AddRpc(string methodName, IRemoteProcedure procedure)
+    public void AddRpc(string methodName, IRemoteProcedureHandler procedure)
     {
         if (_connection == null || _model == null)
             throw new InvalidOperationException("Connection not established");
@@ -61,7 +61,7 @@ public class BasicRabbitMqRpcServer :
             replyProps.CorrelationId = eventArgs.BasicProperties.CorrelationId;
             try
             {
-                var result = await procedure.ExecuteAsync(eventArgs.Body);
+                var result = await procedure.HandleAsync(eventArgs.Body);
 
                 _model.BasicPublish(
                     exchange: "", routingKey: eventArgs.BasicProperties.ReplyTo,
@@ -75,7 +75,7 @@ public class BasicRabbitMqRpcServer :
                     basicProperties: replyProps, body: Encoding.UTF8.GetBytes(ex.Message));
                 _model.BasicNack(eventArgs.DeliveryTag, false, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _model.BasicNack(eventArgs.DeliveryTag, false, true);
             }
@@ -91,7 +91,7 @@ public class BasicRabbitMqRpcServer :
         {
             _connection?.Close();
         }
-        catch (IOException)
+        catch (IOException) 
         {
             // pass, because its anyway closed
         }

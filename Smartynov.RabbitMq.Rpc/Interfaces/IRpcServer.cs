@@ -7,7 +7,7 @@ public interface IRabbitMqRpcServer
     bool Listening { get; }
     
     /// <param name="methodName">name of rpc queue</param>
-    void AddRpc(string methodName, IRemoteProcedure procedure);
+    void AddRpc(string methodName, IRemoteProcedureHandler procedure);
     
     void Stop();
 }

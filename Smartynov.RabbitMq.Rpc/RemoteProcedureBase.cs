@@ -1,21 +1,37 @@
-﻿namespace Smartynov.RabbitMq.Rpc;
+﻿using System.Runtime.ExceptionServices;
+
+namespace Smartynov.RabbitMq.Rpc;
 
 /// <summary>
 /// Base class for processing remote procedure calls.
 /// In basic usage, marks procedure as succeeded if no exception is thrown. Else marks procedure as failed.
 /// </summary>
-public abstract class RemoteProcedureBase<TArgument, TResult> : IRemoteProcedure
-    where TArgument : class, IRemoteProcedureArgument, new()
-    where TResult : class, IRemoteProcedureResult
+public abstract class RemoteProcedureBase<TArgument, TResult> : IRemoteProcedureHandler
+    where TArgument : class
+    where TResult : class
 {
-    public async Task<ReadOnlyMemory<byte>?> ExecuteAsync(ReadOnlyMemory<byte> request)
+    private readonly IDeserializationProvider<TArgument> _deserializationProvider;
+    private readonly ISerializationProvider<TResult> _serializationProvider;
+
+    protected RemoteProcedureBase(IDeserializationProvider<TArgument> deserializationProvider, ISerializationProvider<TResult> serializationProvider)
     {
-        var argument = new TArgument();
-        argument.Parse(request);
+        _deserializationProvider = deserializationProvider;
+        _serializationProvider = serializationProvider;
+    }
+    
+    protected RemoteProcedureBase()
+    {
+        _deserializationProvider = new BasicJsonDeserializationProvider<TArgument>();
+        _serializationProvider = new BasicJsonSerializationProvider<TResult>();
+    }
+
+    public async Task<ReadOnlyMemory<byte>?> HandleAsync(ReadOnlyMemory<byte> request)
+    {
+        var argument = _deserializationProvider.Deserialize(request);
         try
         {
             var result = await ProcessRequest(argument);
-            return result.Serialize();
+            return _serializationProvider.Serialize(result);
         }
         catch (Exception ex) when (ex is not RemoteProcedureException)
         {
@@ -36,13 +52,5 @@ public abstract class RemoteProcedureBase<TArgument, TResult> : IRemoteProcedure
     /// If you want to handle exception, override this method.
     /// </summary>
     protected virtual void HandleException(Exception exception)
-        => throw new RemoteProcedureException("procedure failed", exception);
-}
-
-public class RemoteProcedureException : Exception
-{
-    public RemoteProcedureException(string message, Exception exception)
-        : base(message, exception)
-    {
-    }
+        => ExceptionDispatchInfo.Capture(exception).Throw();
 }
