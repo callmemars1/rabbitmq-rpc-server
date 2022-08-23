@@ -19,8 +19,7 @@ public class BasicRabbitMqRpcServer :
     }
     public BasicRabbitMqRpcServer(RabbitMqConnectionProperties connectionProperties)
     {
-        _connectionUri = 
-            new Uri($"amqp://{connectionProperties.Username}:{connectionProperties.Password}@{connectionProperties.Hostname}:{connectionProperties.Port}/{connectionProperties.VirtualHost}");
+        _connectionUri = connectionProperties.ToUri();
     }
 
     public void Start()
@@ -29,15 +28,21 @@ public class BasicRabbitMqRpcServer :
         {
             Uri = _connectionUri,
 
-            DispatchConsumersAsync = true
+            DispatchConsumersAsync = true,
+            AutomaticRecoveryEnabled = true,
+            TopologyRecoveryEnabled = true,
+            NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
         };
         _connection = connectionFactory.CreateConnection();
         _model = _connection.CreateModel();
         _model.BasicQos(
             prefetchSize: 0, prefetchCount: 1, global: false);
+        Listening = true;
     }
 
-    public void AddRpc(string methodName, IRemoteProcedure procedure)
+    public bool Listening { get; protected set; }
+
+    public void AddRpc(string methodName, IRemoteProcedureHandler procedure)
     {
         if (_connection == null || _model == null)
             throw new InvalidOperationException("Connection not established");
@@ -56,7 +61,7 @@ public class BasicRabbitMqRpcServer :
             replyProps.CorrelationId = eventArgs.BasicProperties.CorrelationId;
             try
             {
-                var result = await procedure.ExecuteAsync(eventArgs.Body);
+                var result = await procedure.HandleAsync(eventArgs.Body);
 
                 _model.BasicPublish(
                     exchange: "", routingKey: eventArgs.BasicProperties.ReplyTo,
@@ -70,7 +75,7 @@ public class BasicRabbitMqRpcServer :
                     basicProperties: replyProps, body: Encoding.UTF8.GetBytes(ex.Message));
                 _model.BasicNack(eventArgs.DeliveryTag, false, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _model.BasicNack(eventArgs.DeliveryTag, false, true);
             }
@@ -86,12 +91,13 @@ public class BasicRabbitMqRpcServer :
         {
             _connection?.Close();
         }
-        catch (IOException)
+        catch (IOException) 
         {
             // pass, because its anyway closed
         }
 
         _connection?.Dispose();
+        Listening = false;
     }
 
     protected virtual void Dispose(bool disposing)
